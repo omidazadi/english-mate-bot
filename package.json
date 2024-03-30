@@ -1,0 +1,36 @@
+{
+  "name": "english-mate-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot that provides tools for a better English learning experience.",
+  "scripts": {
+    "build": "rm -rf ./build && npx tsc --project tsconfig.build.json",
+    "start": "npm run build && node build/launcher.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omidazadi/english-mate-bot.git"
+  },
+  "author": "Omid Azadi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/omidazadi/english-mate-bot/issues"
+  },
+  "homepage": "https://github.com/omidazadi/english-mate-bot#readme",
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "@types/nunjucks": "^3.2.6",
+    "@types/pg": "^8.11.2",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "cron": "^3.1.6",
+    "dotenv": "^16.4.5",
+    "fsrs.js": "^1.2.2",
+    "grammy": "^1.21.1",
+    "nunjucks": "^3.2.4",
+    "pg": "^8.11.3"
+  }
+}

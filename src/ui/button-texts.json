@@ -1,0 +1,23 @@
+{
+    "command": {
+        "start": "/start"
+    },
+
+    "state": {
+        "word_reminder": {
+            "review": "Review Your Words 📋",
+            "add": "Add a Word 🇦 🇧 🇨",
+            "manage": "Manage Your Words 💼",
+            "statistics": "See Statistics 📊",
+            "talk_to_admin": "Talk to Admin 💻"
+        },
+        "add_word_front": {
+            "back": "Back 🔙"
+        },
+        "add_word_back": {
+            "back": "Back 🔙"
+        }
+    },
+
+    "system": {}
+}

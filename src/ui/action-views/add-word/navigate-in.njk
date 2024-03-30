@@ -1,0 +1,5 @@
+{% if scenario == 'error-too-many' %}
+You inserted too many words for today. Take a rest and continue tomorrow.
+{% elif scenario == 'success' %}
+{% include "../../state-views/add-word-front.njk" %}
+{% endif %}

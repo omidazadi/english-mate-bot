@@ -1,0 +1,7 @@
+{% if scenario == 'error-invalid-front' %}
+This is not a vaild word.
+{% elif scenario == 'error-already-exists' %}
+This word already exists in your deck.
+{% elif scenario == 'success' %}
+{% include "../../state-views/add-word-back.njk" %}
+{% endif %}

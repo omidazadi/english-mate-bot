@@ -1,0 +1,5 @@
+{% if scenario == 'error-too-many' %}
+{% include "../../state-views/word-reminder-keyboard.njk" %}
+{% elif scenario == 'success' %}
+{% include "../../state-views/add-word-front-keyboard.njk" %}
+{% endif %}

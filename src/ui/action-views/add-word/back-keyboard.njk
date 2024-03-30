@@ -1,0 +1,5 @@
+{% if scenario == 'error-invalid-back' %}
+{% include "../../state-views/add-word-back-keyboard.njk" %}
+{% elif scenario == 'success' %}
+{% include "../../state-views/word-reminder-keyboard.njk" %}
+{% endif %}

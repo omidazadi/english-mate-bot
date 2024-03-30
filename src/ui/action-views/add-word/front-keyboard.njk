@@ -1,0 +1,7 @@
+{% if scenario == 'error-invalid-front' %}
+{% include "../../state-views/add-word-front-keyboard.njk" %}
+{% elif scenario == 'error-already-exists' %}
+{% include "../../state-views/add-word-front-keyboard.njk" %}
+{% elif scenario == 'success' %}
+{% include "../../state-views/add-word-back-keyboard.njk" %}
+{% endif %}
