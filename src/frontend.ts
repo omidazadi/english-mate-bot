@@ -1,20 +1,26 @@
 import { readFile, stat } from 'fs/promises';
-import { Bot as GrammyBot, InlineKeyboard, Keyboard } from 'grammy';
+import {
+    Bot as GrammyBot,
+    GrammyError,
+    InlineKeyboard,
+    Keyboard,
+} from 'grammy';
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from 'grammy/types';
 import nunjucks from 'nunjucks';
+import { Logger } from './logger';
 
 export class Frontend {
     private grammyBot: GrammyBot;
     private buttonTexts: any;
+    private logger: Logger;
 
-    public constructor(grammyBot: GrammyBot) {
+    public constructor(grammyBot: GrammyBot, buttonTexts: any, logger: Logger) {
         this.grammyBot = grammyBot;
+        this.buttonTexts = buttonTexts;
+        this.logger = logger;
     }
 
-    public async configure() {
-        this.buttonTexts = JSON.parse(
-            (await readFile('src/ui/button-texts.json', 'utf8')).toString(),
-        );
+    public configure() {
         nunjucks.configure({ trimBlocks: true, lstripBlocks: true });
     }
 
@@ -23,7 +29,7 @@ export class Frontend {
         action: string,
         options?: {
             context?: object;
-            media?: string;
+            photo?: string;
         },
     ): Promise<void> {
         let context = this.buildHydratedContext(options);
@@ -31,13 +37,37 @@ export class Frontend {
             `src/ui/action-views/${action}.njk`,
             context,
         );
-        await this.grammyBot.api.sendMessage(parseInt(tid), text, {
-            reply_markup: await this.buildButtons(
-                `src/ui/action-views/${action}`,
-                context,
-            ),
-            parse_mode: 'HTML',
-        });
+
+        try {
+            if (typeof options?.photo === 'string') {
+                await this.grammyBot.api.sendPhoto(
+                    parseInt(tid),
+                    options.photo,
+                    {
+                        caption: text,
+                        reply_markup: await this.buildButtons(
+                            `src/ui/action-views/${action}`,
+                            context,
+                        ),
+                        parse_mode: 'HTML',
+                    },
+                );
+            } else {
+                await this.grammyBot.api.sendMessage(parseInt(tid), text, {
+                    reply_markup: await this.buildButtons(
+                        `src/ui/action-views/${action}`,
+                        context,
+                    ),
+                    parse_mode: 'HTML',
+                });
+            }
+        } catch (e: unknown) {
+            if (e instanceof GrammyError) {
+                await this.logger.warn(e.toString());
+            } else {
+                throw e;
+            }
+        }
     }
 
     public async sendSystemMessage(
@@ -45,7 +75,7 @@ export class Frontend {
         messageType: string,
         options?: {
             context?: object;
-            media?: string;
+            photo?: string;
         },
     ): Promise<void> {
         let context = this.buildHydratedContext(options);
@@ -53,13 +83,37 @@ export class Frontend {
             `src/ui/system-views/${messageType}.njk`,
             context,
         );
-        await this.grammyBot.api.sendMessage(parseInt(tid), text, {
-            reply_markup: await this.buildButtons(
-                `src/ui/system-views/${messageType}`,
-                context,
-            ),
-            parse_mode: 'HTML',
-        });
+
+        try {
+            if (typeof options?.photo === 'string') {
+                await this.grammyBot.api.sendPhoto(
+                    parseInt(tid),
+                    options.photo,
+                    {
+                        caption: text,
+                        reply_markup: await this.buildButtons(
+                            `src/ui/system-views/${messageType}`,
+                            context,
+                        ),
+                        parse_mode: 'HTML',
+                    },
+                );
+            } else {
+                await this.grammyBot.api.sendMessage(parseInt(tid), text, {
+                    reply_markup: await this.buildButtons(
+                        `src/ui/system-views/${messageType}`,
+                        context,
+                    ),
+                    parse_mode: 'HTML',
+                });
+            }
+        } catch (e: unknown) {
+            if (e instanceof GrammyError) {
+                await this.logger.warn(e.toString());
+            } else {
+                throw e;
+            }
+        }
     }
 
     private buildHydratedContext(options: any): any {

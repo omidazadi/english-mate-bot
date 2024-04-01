@@ -1,13 +1,10 @@
-import { readFile } from 'fs/promises';
 import { RequestContext } from './context/request-context';
 
 export class Router {
     private buttonTexts: any;
 
-    public async configure() {
-        this.buttonTexts = JSON.parse(
-            (await readFile('src/ui/button-texts.json', 'utf8')).toString(),
-        );
+    public constructor(buttonTexts: any) {
+        this.buttonTexts = buttonTexts;
     }
 
     public route(requestContext: RequestContext): string {
@@ -18,12 +15,12 @@ export class Router {
             return 'word-reminder/jump';
         }
 
-        if (requestContext.user.data.state === 'word-reminder') {
+        if (requestContext.learner.data.state === 'word-reminder') {
             if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.word_reminder.review
             ) {
-                return 'review-word/guess';
+                return 'review-word/navigate-in';
             } else if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.word_reminder.add
@@ -47,7 +44,7 @@ export class Router {
             } else {
                 return 'common/unknown';
             }
-        } else if (requestContext.user.data.state === 'add-word-front') {
+        } else if (requestContext.learner.data.state === 'add-word-front') {
             if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.add_word_front.back
@@ -56,7 +53,7 @@ export class Router {
             } else {
                 return 'add-word/front';
             }
-        } else if (requestContext.user.data.state === 'add-word-back') {
+        } else if (requestContext.learner.data.state === 'add-word-back') {
             if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.add_word_back.back
@@ -64,6 +61,92 @@ export class Router {
                 return 'add-word/navigate-out';
             } else {
                 return 'add-word/back';
+            }
+        } else if (requestContext.learner.data.state === 'review-word') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.review_word.back
+            ) {
+                return 'review-word/navigate-out';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.review_word.show_definition
+            ) {
+                return 'review-word/guess';
+            } else {
+                return 'common/unknown';
+            }
+        } else if (requestContext.learner.data.state === 'rate-word') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.rate_word.back
+            ) {
+                return 'review-word/navigate-out';
+            } else if (
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.rate_word.easy ||
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.rate_word.good ||
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.rate_word.hard ||
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.rate_word.again
+            ) {
+                return 'review-word/rate';
+            } else {
+                return 'common/unknown';
+            }
+        } else if (requestContext.learner.data.state === 'browse-word') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.browse_word.back
+            ) {
+                return 'manage-word/navigate-out';
+            } else {
+                return 'manage-word/browse';
+            }
+        } else if (requestContext.learner.data.state === 'word-view') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.word_view.back
+            ) {
+                return 'manage-word/navigate-out';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.word_view.modify_word
+            ) {
+                return 'manage-word/navigate-to-modify';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.word_view.delete_word
+            ) {
+                return 'manage-word/navigate-to-delete';
+            } else {
+                return 'common/unknown';
+            }
+        } else if (requestContext.learner.data.state === 'modify-word') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.modify_word.back
+            ) {
+                return 'manage-word/navigate-to-view';
+            } else {
+                return 'manage-word/modify';
+            }
+        } else if (requestContext.learner.data.state === 'delete-word') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.delete_word.back
+            ) {
+                return 'manage-word/navigate-to-view';
+            }
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.delete_word.confirm
+            ) {
+                return 'manage-word/delete';
+            } else {
+                return 'common/unknown';
             }
         } else {
             return 'common/unknown';

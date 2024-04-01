@@ -56,6 +56,121 @@ export class CardRepository {
         return this.bake(result.rows[0]);
     }
 
+    public async getCardByOwnerAndWord(
+        owner: number,
+        word: number,
+        poolClient: PoolClient,
+    ): Promise<Card | null> {
+        const result = await poolClient.query(
+            `
+            SELECT *
+            FROM card
+            WHERE
+                card.owner = $1
+                    AND
+                card.word = $2
+            `,
+            [owner, word],
+        );
+
+        if (result.rowCount === 0) {
+            return null;
+        }
+
+        return this.bake(result.rows[0]);
+    }
+
+    public async getOneDueCard(
+        owner: number,
+        poolClient: PoolClient,
+    ): Promise<Card | null> {
+        const result = await poolClient.query(
+            `
+            SELECT *
+            FROM card
+            WHERE 
+                owner = $1
+                    AND
+                is_due = TRUE
+            LIMIT 1
+            `,
+            [owner],
+        );
+
+        if (result.rowCount === 0) {
+            return null;
+        }
+
+        return this.bake(result.rows[0]);
+    }
+
+    public async getNoCards(
+        owner: number,
+        poolClient: PoolClient,
+    ): Promise<Card | null> {
+        const result = await poolClient.query(
+            `
+            SELECT COUNT(*) as no_cards
+            FROM card
+            WHERE owner = $1
+            `,
+            [owner],
+        );
+
+        return result.rows[0].no_cards;
+    }
+
+    public async getNoDueCards(
+        owner: number,
+        poolClient: PoolClient,
+    ): Promise<Card | null> {
+        const result = await poolClient.query(
+            `
+            SELECT COUNT(*) as no_due_cards
+            FROM card
+            WHERE 
+                owner = $1
+                    AND
+                is_due = TRUE
+            `,
+            [owner],
+        );
+
+        return result.rows[0].no_due_cards;
+    }
+
+    public async updateCard(card: Card, poolClient: PoolClient): Promise<void> {
+        await poolClient.query(
+            `
+            UPDATE card
+            SET fsrs_info = $3, is_due = $4
+            WHERE 
+                card.owner = $1
+                    AND
+                card.word = $2
+            `,
+            [card.owner, card.word, card.fsrsInfo, card.isDue],
+        );
+    }
+
+    public async deleteCard(
+        owner: number,
+        word: number,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            DELETE
+            FROM card
+            WHERE
+                owner = $1
+                    AND
+                word = $2
+            `,
+            [owner, word],
+        );
+    }
+
     public async updateAllDueDates(poolClient: PoolClient): Promise<void> {
         await poolClient.query(
             `
@@ -66,12 +181,21 @@ export class CardRepository {
         );
     }
 
-    private bake(row: any): Card {
-        return new Card(
-            row.owner,
-            row.word,
-            plainToInstance(FSRSCard, row.fsrs_info),
-            row.is_due,
+    public async getNoAllCards(poolClient: PoolClient): Promise<number> {
+        const result = await poolClient.query(
+            `
+            SELECT COUNT(*) as no_all_cards
+            FROM card
+            `,
         );
+
+        return result.rows[0].no_all_cards;
+    }
+
+    private bake(row: any): Card {
+        const fsrsCard = plainToInstance(FSRSCard, row.fsrs_info);
+        fsrsCard.due = new Date(fsrsCard.due);
+        fsrsCard.last_review = new Date(fsrsCard.last_review);
+        return new Card(row.owner, row.word, fsrsCard, row.is_due);
     }
 }

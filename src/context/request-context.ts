@@ -4,16 +4,16 @@ import { TelegramContext } from './telegram-context';
 
 export class RequestContext {
     public telegramContext: TelegramContext;
-    public user: Learner;
+    public learner: Learner;
     public poolClient: PoolClient;
 
     public constructor(
         telegramContext: TelegramContext,
-        user: Learner,
+        learner: Learner,
         poolClient: PoolClient,
     ) {
         this.telegramContext = telegramContext;
-        this.user = user;
+        this.learner = learner;
         this.poolClient = poolClient;
     }
 }

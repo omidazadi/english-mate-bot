@@ -1,20 +1,28 @@
 import { RequestContext } from '../context/request-context';
 import { AddWordRootHandler } from './add-word/root';
 import { CommonRootHandler } from './common/root';
+import { ManageWordRootHandler } from './manage-word/root';
+import { ReviewWordRootHandler } from './review-word/root';
 import { WordReminderRootHandler } from './word-reminder/root';
 
 export class RootHandler {
+    private reviewWordRootHandler: ReviewWordRootHandler;
     private addWordRootHandler: AddWordRootHandler;
     private wordReminderRootHandler: WordReminderRootHandler;
+    private manageWordRootHandler: ManageWordRootHandler;
     private commonRootHandler: CommonRootHandler;
 
     public constructor(
+        reviewWordRootHandler: ReviewWordRootHandler,
         addWordRootHandler: AddWordRootHandler,
         wordReminderRootHandler: WordReminderRootHandler,
+        manageWordRootHandler: ManageWordRootHandler,
         commonRootHandler: CommonRootHandler,
     ) {
+        this.reviewWordRootHandler = reviewWordRootHandler;
         this.addWordRootHandler = addWordRootHandler;
         this.wordReminderRootHandler = wordReminderRootHandler;
+        this.manageWordRootHandler = manageWordRootHandler;
         this.commonRootHandler = commonRootHandler;
     }
 
@@ -24,10 +32,14 @@ export class RootHandler {
     ): Promise<void> {
         const splittedPath = path.split('/');
         const nextPath = splittedPath.slice(1, splittedPath.length).join('/');
-        if (splittedPath[0] === 'add-word') {
+        if (splittedPath[0] === 'review-word') {
+            await this.reviewWordRootHandler.handle(nextPath, requestContext);
+        } else if (splittedPath[0] === 'add-word') {
             await this.addWordRootHandler.handle(nextPath, requestContext);
         } else if (splittedPath[0] === 'word-reminder') {
             await this.wordReminderRootHandler.handle(nextPath, requestContext);
+        } else if (splittedPath[0] === 'manage-word') {
+            await this.manageWordRootHandler.handle(nextPath, requestContext);
         } else if (splittedPath[0] === 'common') {
             await this.commonRootHandler.handle(nextPath, requestContext);
         }

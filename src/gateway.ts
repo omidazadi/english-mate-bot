@@ -3,6 +3,7 @@ import { Router } from './router';
 import { ContextManager } from './context/context-manager';
 import { RootHandler } from './handlers/root';
 import { DatabaseManager } from './database/database-manager';
+import { Logger } from './logger';
 
 export class Gateway {
     private grammyBot: GrammyBot;
@@ -10,6 +11,7 @@ export class Gateway {
     private contextManager: ContextManager;
     private databaseManager: DatabaseManager;
     private rootHandler: RootHandler;
+    private logger: Logger;
 
     public constructor(
         grammyBot: GrammyBot,
@@ -17,12 +19,14 @@ export class Gateway {
         contextManager: ContextManager,
         databaseManager: DatabaseManager,
         rootHandler: RootHandler,
+        logger: Logger,
     ) {
         this.grammyBot = grammyBot;
         this.router = router;
         this.contextManager = contextManager;
         this.databaseManager = databaseManager;
         this.rootHandler = rootHandler;
+        this.logger = logger;
     }
 
     public async configure(): Promise<void> {
@@ -43,6 +47,7 @@ export class Gateway {
                     );
                 } catch (e: unknown) {
                     console.log(e);
+                    await this.logger.warn(e!.toString());
                     await this.rootHandler.handle(
                         'common/internal-error',
                         requestContext,

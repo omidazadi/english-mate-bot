@@ -1,5 +1,5 @@
+import { instanceToInstance } from 'class-transformer';
 import { RequestContext } from '../../context/request-context';
-import { Learner } from '../../database/models/learner';
 import { Handler } from '../handler';
 
 export class AddWordFrontHandler extends Handler {
@@ -11,7 +11,7 @@ export class AddWordFrontHandler extends Handler {
                 this.constant.card.frontSize
         ) {
             await this.frontend.sendActionMessage(
-                requestContext.user.tid,
+                requestContext.learner.tid,
                 'add-word/front',
                 { context: { scenario: 'error-invalid-front' } },
             );
@@ -20,36 +20,30 @@ export class AddWordFrontHandler extends Handler {
 
         if (
             (await this.repository.card.getCardByOwnerAndFront(
-                requestContext.user.id,
+                requestContext.learner.id,
                 requestContext.telegramContext.text,
                 requestContext.poolClient,
             )) !== null
         ) {
             await this.frontend.sendActionMessage(
-                requestContext.user.tid,
+                requestContext.learner.tid,
                 'add-word/front',
                 { context: { scenario: 'error-already-exists' } },
             );
             return;
         }
 
-        const learner = new Learner(
-            requestContext.user.id,
-            requestContext.user.tid,
-            {
-                state: 'add-word-back',
-                front: requestContext.telegramContext.text,
-            },
-            requestContext.user.accessLevel,
-            requestContext.user.dailyReviews,
-            requestContext.user.dailyAddedCards,
-        );
+        const learner = instanceToInstance(requestContext.learner);
+        learner.data = {
+            state: 'add-word-back',
+            front: requestContext.telegramContext.text,
+        };
         await this.repository.learner.updateLearner(
             learner,
             requestContext.poolClient,
         );
         await this.frontend.sendActionMessage(
-            requestContext.user.tid,
+            requestContext.learner.tid,
             'add-word/front',
             { context: { scenario: 'success' } },
         );

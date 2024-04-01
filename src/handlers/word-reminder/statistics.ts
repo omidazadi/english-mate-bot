@@ -1,25 +1,28 @@
+import { instanceToInstance } from 'class-transformer';
 import { RequestContext } from '../../context/request-context';
-import { Learner } from '../../database/models/learner';
 import { Handler } from '../handler';
 
 export class WordReminderStatisticsHandler extends Handler {
     public async handle(requestContext: RequestContext): Promise<void> {
-        const learner = new Learner(
-            requestContext.user.id,
-            requestContext.user.tid,
-            { state: 'word-reminder' },
-            requestContext.user.accessLevel,
-            requestContext.user.dailyReviews,
-            requestContext.user.dailyAddedCards,
+        const noCards = await this.repository.card.getNoCards(
+            requestContext.learner.id,
+            requestContext.poolClient,
         );
+        const noDueCards = await this.repository.card.getNoDueCards(
+            requestContext.learner.id,
+            requestContext.poolClient,
+        );
+
+        const learner = instanceToInstance(requestContext.learner);
+        learner.data = { state: 'word-reminder' };
         await this.repository.learner.updateLearner(
             learner,
             requestContext.poolClient,
         );
         await this.frontend.sendActionMessage(
-            requestContext.user.tid,
+            requestContext.learner.tid,
             'word-reminder/statistics',
-            { context: {} },
+            { context: { no_cards: noCards, no_due_cards: noDueCards } },
         );
     }
 }

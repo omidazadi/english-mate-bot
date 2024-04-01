@@ -1,0 +1,5 @@
+{% if scenario == 'error-does-not-exist' %}
+This word does not exist in your deck.
+{% elif scenario == 'success' %}
+{% include "../../state-views/word-view.njk" %}
+{% endif %}

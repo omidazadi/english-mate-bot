@@ -1,11 +1,11 @@
 import { Bot as GrammyBot } from 'grammy';
 import { RequestContext } from '../../context/request-context';
-import { Learner } from '../../database/models/learner';
 import { Handler } from '../handler';
 import { Repository } from '../../database/repositories/repository';
 import { Frontend } from '../../frontend';
 import { BotConfig } from '../../configs/bot-config';
 import { Constant } from '../../constants/constant';
+import { instanceToInstance } from 'class-transformer';
 
 export class WordReminderTalkToAdminHandler extends Handler {
     private grammyBot: GrammyBot;
@@ -22,14 +22,8 @@ export class WordReminderTalkToAdminHandler extends Handler {
     }
 
     public async handle(requestContext: RequestContext): Promise<void> {
-        const learner = new Learner(
-            requestContext.user.id,
-            requestContext.user.tid,
-            { state: 'word-reminder' },
-            requestContext.user.accessLevel,
-            requestContext.user.dailyReviews,
-            requestContext.user.dailyAddedCards,
-        );
+        const learner = instanceToInstance(requestContext.learner);
+        learner.data = { state: 'word-reminder' };
         await this.repository.learner.updateLearner(
             learner,
             requestContext.poolClient,
@@ -38,7 +32,7 @@ export class WordReminderTalkToAdminHandler extends Handler {
             parseInt(this.botConfig.ownerTid),
         );
         await this.frontend.sendActionMessage(
-            requestContext.user.tid,
+            requestContext.learner.tid,
             'word-reminder/talk-to-admin',
             {
                 context: {

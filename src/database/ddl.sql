@@ -43,8 +43,8 @@ DO $$
                 word INTEGER NOT NULL,
                 fsrs_info JSONB NOT NULL,
                 is_due BOOLEAN NOT NULL,
-                FOREIGN KEY (owner) REFERENCES learner (id),
-                FOREIGN KEY (word) REFERENCES word (id),
+                FOREIGN KEY (owner) REFERENCES learner (id) ON DELETE CASCADE,
+                FOREIGN KEY (word) REFERENCES word (id) ON DELETE CASCADE,
                 PRIMARY KEY (owner, word)
             );
 

@@ -33,7 +33,7 @@ export namespace Learner {
         | 'browse-word'
         | 'word-view'
         | 'modify-word'
-        | 'modify-word-back'
+        | 'delete-word'
         | 'review-word'
         | 'rate-word'
         | 'cli'
@@ -41,6 +41,6 @@ export namespace Learner {
 
     export type Data = {
         state: State;
-        [key: string]: string;
+        [key: string]: any;
     };
 }

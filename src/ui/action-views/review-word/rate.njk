@@ -1,0 +1,5 @@
+{% if scenario == 'finished' %}
+You finished your today's words! Enjoy the rest of your day. ☕
+{% elif scenario == 'next' %}
+{% include "../../state-views/review-word.njk" %}
+{% endif %}

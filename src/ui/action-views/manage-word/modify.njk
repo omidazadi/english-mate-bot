@@ -1,0 +1,5 @@
+{% if scenario == 'error-invalid-back' %}
+This is not a vaild definition.
+{% elif scenario == 'success' %}
+{% include "../../state-views/word-view.njk" %}
+{% endif %}

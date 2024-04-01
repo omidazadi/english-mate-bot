@@ -23,12 +23,43 @@ export class WordRepository {
         return this.bake(result.rows[0]);
     }
 
+    public async getWord(
+        id: number,
+        poolClient: PoolClient,
+    ): Promise<Word | null> {
+        const result = await poolClient.query(
+            `
+            SELECT *
+            FROM word
+            WHERE id = $1
+            `,
+            [id],
+        );
+
+        if (result.rowCount === 0) {
+            return null;
+        }
+
+        return this.bake(result.rows[0]);
+    }
+
+    public async deleteWord(id: number, poolClient: PoolClient): Promise<void> {
+        await poolClient.query(
+            `
+            DELETE
+            FROM word
+            WHERE id = $1
+            `,
+            [id],
+        );
+    }
+
     public async updateWord(word: Word, poolClient: PoolClient): Promise<void> {
         await poolClient.query(
             `
             UPDATE word
             SET front = $2, back = $3, media = $4, access_type = $5
-            WHERE owner = $1
+            WHERE id = $1
             `,
             [word.id, word.front, word.back, word.media, word.accessType],
         );

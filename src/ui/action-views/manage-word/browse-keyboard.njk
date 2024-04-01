@@ -1,0 +1,5 @@
+{% if scenario == 'error-does-not-exist' %}
+{% include "../../state-views/browse-word-keyboard.njk" %}
+{% elif scenario == 'success' %}
+{% include "../../state-views/word-view-keyboard.njk" %}
+{% endif %}

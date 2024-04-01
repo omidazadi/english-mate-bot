@@ -1,0 +1,5 @@
+{% if scenario == 'error-nothing-to-review' %}
+You have no words to review today! Enjoy the rest of your day. ☕
+{% elif scenario == 'success' %}
+{% include "../../state-views/review-word.njk" %}
+{% endif %}

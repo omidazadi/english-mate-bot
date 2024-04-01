@@ -16,6 +16,32 @@
         },
         "add_word_back": {
             "back": "Back 🔙"
+        },
+        "review_word": {
+            "show_definition": "Show Definition 🔎",
+            "back": "Back 🔙"
+        },
+        "rate_word": {
+            "easy": "Easy",
+            "good": "Good",
+            "hard": "Hard",
+            "again": "Again",
+            "back": "Back 🔙"
+        },
+        "browse_word": {
+            "back": "Back 🔙"
+        },
+        "word_view": {
+            "modify_word": "Modify 🔧",
+            "delete_word": "Delete 🗑️",
+            "back": "Back 🔙"
+        },
+        "modify_word": {
+            "back": "Back 🔙"
+        },
+        "delete_word": {
+            "confirm": "Yes, I am sure 💔",
+            "back": "Back 🔙"
         }
     },
 

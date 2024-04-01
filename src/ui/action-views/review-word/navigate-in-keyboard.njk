@@ -1,0 +1,5 @@
+{% if scenario == 'error-nothing-to-review' %}
+{% include "../../state-views/word-reminder-keyboard.njk" %}
+{% elif scenario == 'success' %}
+{% include "../../state-views/review-word-keyboard.njk" %}
+{% endif %}

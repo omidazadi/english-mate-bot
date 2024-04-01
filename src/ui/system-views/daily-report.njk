@@ -1,0 +1,8 @@
+{% extends "./base-log.njk" %}
+
+{% block log_message %}
+Sent {{ total_notifications }} daily notifications. 
+                    
+Total Cards: {{ total_cards }}
+Cards due for today: {{ total_dues }}
+{% endblock %}

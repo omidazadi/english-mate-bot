@@ -23,16 +23,39 @@ import { AddWordNavigateInHandler } from './handlers/add-word/navigate-in';
 import { AddWordNavigateOutHandler } from './handlers/add-word/navigate-out';
 import { AddWordFrontHandler } from './handlers/add-word/front';
 import { AddWordBackHandler } from './handlers/add-word/back';
+import { ReviewWordGuessHandler } from './handlers/review-word/guess';
+import { ReviewWordNavigateOutHandler } from './handlers/review-word/navigate-out';
+import { ReviewWordRateHandler } from './handlers/review-word/rate';
+import { ReviewWordRootHandler } from './handlers/review-word/root';
+import { ReviewWordNavigateInHandler } from './handlers/review-word/navigate-in';
+import { readFile } from 'fs/promises';
+import { Logger } from './logger';
+import { ManageWordNavigateInHandler } from './handlers/manage-word/navigate-in';
+import { ManageWordNavigateOutHandler } from './handlers/manage-word/navigate-out';
+import { ManageWordNavigateToModifyHandler } from './handlers/manage-word/navigate-to-modify';
+import { ManageWordNavigateToDeleteHandler } from './handlers/manage-word/navigate-to-delete';
+import { ManageWordNavigateToViewHandler } from './handlers/manage-word/navigate-to-view';
+import { ManageWordBrowseHandler } from './handlers/manage-word/browse';
+import { ManageWordDeleteHandler } from './handlers/manage-word/delete';
+import { ManageWordModifyHandler } from './handlers/manage-word/modify';
+import { ManageWordRootHandler } from './handlers/manage-word/root';
 
 export class Bot {
     private gateway: Gateway | undefined;
     private dailyCronJob: CronJob | undefined;
+    private logger: Logger | undefined;
 
     public async configure(config: Config) {
         const constant = new Constant();
         const grammyBot = new GrammyBot(config.telegramConfig.botToken);
-        const frontend = new Frontend(grammyBot);
-        await frontend.configure();
+        this.logger = new Logger(config.loggerConfig);
+        await this.logger.configure(grammyBot);
+        const buttonTexts = JSON.parse(
+            (await readFile('src/ui/button-texts.json', 'utf8')).toString(),
+        );
+        const frontend = new Frontend(grammyBot, buttonTexts, this.logger);
+        frontend.configure();
+        this.logger.setFrontend(frontend);
         const repository = new Repository();
         const databaseManager = new DatabaseManager(config.postgresConfig);
         await databaseManager.executeDDL();
@@ -41,10 +64,43 @@ export class Bot {
             databaseManager,
             config.botConfig,
         );
-        const router = new Router();
-        await router.configure();
-        const agent = new Agent(frontend, config.agentConfig);
+        const router = new Router(buttonTexts);
+        const agent = new Agent(frontend, config.agentConfig, constant);
 
+        // Review Word Handlers
+        const reviewWordGuessHandler = new ReviewWordGuessHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const reviewWordNavigateInHandler = new ReviewWordNavigateInHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const reviewWordNavigateOutHandler = new ReviewWordNavigateOutHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const reviewWordRateHandler = new ReviewWordRateHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+            buttonTexts,
+        );
+        const reviewWordRootHandler = new ReviewWordRootHandler(
+            reviewWordGuessHandler,
+            reviewWordNavigateInHandler,
+            reviewWordNavigateOutHandler,
+            reviewWordRateHandler,
+        );
+
+        // Add Word Handlers
         const addWordNavigateInHandler = new AddWordNavigateInHandler(
             repository,
             frontend,
@@ -128,10 +184,75 @@ export class Bot {
             commonUnsupportedMediaHandler,
         );
 
+        // Manage Word Handlers
+        const manageWordNavigateInHandler = new ManageWordNavigateInHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const manageWordNavigateOutHandler = new ManageWordNavigateOutHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const manageWordNavigateToModifyHandler =
+            new ManageWordNavigateToModifyHandler(
+                repository,
+                frontend,
+                config.botConfig,
+                constant,
+            );
+        const manageWordNavigateToDeleteHandler =
+            new ManageWordNavigateToDeleteHandler(
+                repository,
+                frontend,
+                config.botConfig,
+                constant,
+            );
+        const manageWordNavigateToViewHandler =
+            new ManageWordNavigateToViewHandler(
+                repository,
+                frontend,
+                config.botConfig,
+                constant,
+            );
+        const manageWordBrowseHandler = new ManageWordBrowseHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const manageWordDeleteHandler = new ManageWordDeleteHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const manageWordModifyHandler = new ManageWordModifyHandler(
+            repository,
+            frontend,
+            config.botConfig,
+            constant,
+        );
+        const manageWordRootHandler = new ManageWordRootHandler(
+            manageWordNavigateInHandler,
+            manageWordNavigateOutHandler,
+            manageWordNavigateToModifyHandler,
+            manageWordNavigateToDeleteHandler,
+            manageWordNavigateToViewHandler,
+            manageWordBrowseHandler,
+            manageWordDeleteHandler,
+            manageWordModifyHandler,
+        );
+
         // Root Handler
         const rootHandler = new RootHandler(
+            reviewWordRootHandler,
             addWordRootHandler,
             wordReminderRootHandler,
+            manageWordRootHandler,
             commonRootHandler,
         );
 
@@ -141,23 +262,34 @@ export class Bot {
             contextManager,
             databaseManager,
             rootHandler,
+            this.logger,
         );
         this.gateway.configure();
 
         this.dailyCronJob = new CronJob(
-            '0 9 * * *',
+            '* * * * *',
             async () => {
                 const poolClient = await databaseManager.createTransaction();
                 await repository.card.updateAllDueDates(poolClient);
                 await repository.learner.resetDailyStatistics(poolClient);
                 const notificationData =
                     await repository.learner.getNotificationData(poolClient);
+                const totalCards = await repository.card.getNoAllCards(
+                    poolClient,
+                );
                 await databaseManager.commitTransaction(poolClient);
 
-                await agent.sendReviewNotificationBatch(
-                    notificationData.map((value: [string, number]) => {
-                        return { learnerTid: value[0], noDues: value[1] };
-                    }),
+                const [totalNotifications, totalDues] =
+                    await agent.sendReviewNotificationBatch(
+                        notificationData.map((value: [string, number]) => {
+                            return { learnerTid: value[0], noDues: value[1] };
+                        }),
+                    );
+
+                await this.logger?.dailyReport(
+                    totalNotifications,
+                    totalCards,
+                    totalDues,
                 );
             },
             null,
@@ -172,7 +304,10 @@ export class Bot {
         }
 
         if (typeof this.gateway !== 'undefined') {
-            await this.gateway.open();
+            this.gateway.open();
+            if (typeof this.logger !== 'undefined') {
+                await this.logger.log('Bot is live.');
+            }
         }
     }
 
@@ -182,6 +317,9 @@ export class Bot {
         }
 
         if (typeof this.gateway !== 'undefined') {
+            if (typeof this.logger !== 'undefined') {
+                await this.logger.log('Bot is down.');
+            }
             await this.gateway.close();
         }
     }
