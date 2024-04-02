@@ -36,8 +36,7 @@ export namespace Learner {
         | 'delete-word'
         | 'review-word'
         | 'rate-word'
-        | 'cli'
-        | 'notify-all';
+        | 'cli';
 
     export type Data = {
         state: State;

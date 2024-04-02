@@ -46,13 +46,18 @@ export class Gateway {
                         requestContext.poolClient,
                     );
                 } catch (e: unknown) {
-                    console.log(e);
                     await this.logger.warn(e!.toString());
+                    await this.databaseManager.rollbackTransaction(
+                        requestContext.poolClient,
+                    );
+
+                    requestContext.poolClient =
+                        await this.databaseManager.createTransaction();
                     await this.rootHandler.handle(
                         'common/internal-error',
                         requestContext,
                     );
-                    await this.databaseManager.rollbackTransaction(
+                    await this.databaseManager.commitTransaction(
                         requestContext.poolClient,
                     );
                 }

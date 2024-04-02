@@ -4,6 +4,7 @@ export class Word {
     public back: string | null;
     public media: string | null;
     public accessType: 'public' | 'paid' | 'private';
+    public tag: number;
 
     public constructor(
         id: number,
@@ -11,11 +12,13 @@ export class Word {
         back: string | null,
         media: string | null,
         accessType: 'public' | 'paid' | 'private',
+        tag: number,
     ) {
         this.id = id;
         this.front = front;
         this.back = back;
         this.media = media;
         this.accessType = accessType;
+        this.tag = tag;
     }
 }

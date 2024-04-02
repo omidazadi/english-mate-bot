@@ -35,7 +35,8 @@ DO $$
                 front VARCHAR(256) NOT NULL,
                 back TEXT,
                 media VARCHAR(256),
-                access_type VARCHAR(64) NOT NULL CHECK (access_type = 'public' OR access_type = 'paid' OR access_type = 'private')
+                access_type VARCHAR(64) NOT NULL CHECK (access_type = 'public' OR access_type = 'paid' OR access_type = 'private'),
+                tag INTEGER NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS card (

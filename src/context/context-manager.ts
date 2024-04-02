@@ -68,6 +68,11 @@ export class ContextManager {
             }
         }
 
-        return new TelegramContext(tid, text, photo);
+        return new TelegramContext(
+            tid,
+            text,
+            photo,
+            tid === this.botConfig.ownerTid ? true : false,
+        );
     }
 }

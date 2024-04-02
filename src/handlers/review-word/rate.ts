@@ -1,5 +1,4 @@
 import { FSRS, Rating } from 'fsrs.js';
-import { BotConfig } from '../../configs/bot-config';
 import { Constant } from '../../constants/constant';
 import { RequestContext } from '../../context/request-context';
 import { Card } from '../../database/models/card';
@@ -15,11 +14,10 @@ export class ReviewWordRateHandler extends Handler {
     public constructor(
         repository: Repository,
         frontend: Frontend,
-        botConfig: BotConfig,
         constant: Constant,
         buttonTexts: any,
     ) {
-        super(repository, frontend, botConfig, constant);
+        super(repository, frontend, constant);
         this.buttonTexts = buttonTexts;
     }
 

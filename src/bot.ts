@@ -39,6 +39,11 @@ import { ManageWordBrowseHandler } from './handlers/manage-word/browse';
 import { ManageWordDeleteHandler } from './handlers/manage-word/delete';
 import { ManageWordModifyHandler } from './handlers/manage-word/modify';
 import { ManageWordRootHandler } from './handlers/manage-word/root';
+import { AdminNavigateInHandler } from './handlers/admin/navigate-in';
+import { AdminNavigateOutHandler } from './handlers/admin/navigate-out';
+import { AdminCommandHandler } from './handlers/admin/command';
+import { AdminRootHandler } from './handlers/admin/root';
+import { AddWordPublicBulkHandler } from './handlers/add-word/public-bulk';
 
 export class Bot {
     private gateway: Gateway | undefined;
@@ -71,25 +76,21 @@ export class Bot {
         const reviewWordGuessHandler = new ReviewWordGuessHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const reviewWordNavigateInHandler = new ReviewWordNavigateInHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const reviewWordNavigateOutHandler = new ReviewWordNavigateOutHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const reviewWordRateHandler = new ReviewWordRateHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
             buttonTexts,
         );
@@ -104,25 +105,26 @@ export class Bot {
         const addWordNavigateInHandler = new AddWordNavigateInHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const addWordNavigateOutHandler = new AddWordNavigateOutHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const addWordFrontHandler = new AddWordFrontHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const addWordBackHandler = new AddWordBackHandler(
             repository,
             frontend,
-            config.botConfig,
+            constant,
+        );
+        const addWordPublicBulkHandler = new AddWordPublicBulkHandler(
+            repository,
+            frontend,
             constant,
         );
         const addWordRootHandler = new AddWordRootHandler(
@@ -130,28 +132,27 @@ export class Bot {
             addWordNavigateOutHandler,
             addWordFrontHandler,
             addWordBackHandler,
+            addWordPublicBulkHandler,
         );
 
         // Word Reminder Handlers
         const wordReminderJumpHandler = new WordReminderJumpHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const wordReminderStatisticsHandler = new WordReminderStatisticsHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const wordReminderTalkToAdminHandler =
             new WordReminderTalkToAdminHandler(
                 repository,
                 frontend,
-                config.botConfig,
                 constant,
                 grammyBot,
+                config.botConfig,
             );
         const wordReminderRootHandler = new WordReminderRootHandler(
             wordReminderJumpHandler,
@@ -163,19 +164,16 @@ export class Bot {
         const commonUnknownHandler = new CommonUnknownHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const commonInternalErrorHandler = new CommonInternalErrorHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const commonUnsupportedMediaHandler = new CommonUnsupportedMediaHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const commonRootHandler = new CommonRootHandler(
@@ -188,52 +186,40 @@ export class Bot {
         const manageWordNavigateInHandler = new ManageWordNavigateInHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const manageWordNavigateOutHandler = new ManageWordNavigateOutHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const manageWordNavigateToModifyHandler =
             new ManageWordNavigateToModifyHandler(
                 repository,
                 frontend,
-                config.botConfig,
                 constant,
             );
         const manageWordNavigateToDeleteHandler =
             new ManageWordNavigateToDeleteHandler(
                 repository,
                 frontend,
-                config.botConfig,
                 constant,
             );
         const manageWordNavigateToViewHandler =
-            new ManageWordNavigateToViewHandler(
-                repository,
-                frontend,
-                config.botConfig,
-                constant,
-            );
+            new ManageWordNavigateToViewHandler(repository, frontend, constant);
         const manageWordBrowseHandler = new ManageWordBrowseHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const manageWordDeleteHandler = new ManageWordDeleteHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const manageWordModifyHandler = new ManageWordModifyHandler(
             repository,
             frontend,
-            config.botConfig,
             constant,
         );
         const manageWordRootHandler = new ManageWordRootHandler(
@@ -247,12 +233,38 @@ export class Bot {
             manageWordModifyHandler,
         );
 
+        // Admin Handlers
+        const adminNavigateInHandler = new AdminNavigateInHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const adminNavigateOutHandler = new AdminNavigateOutHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const adminCommandHandler = new AdminCommandHandler(
+            repository,
+            frontend,
+            constant,
+            grammyBot,
+            config.classroomConfig,
+            config.botConfig,
+        );
+        const adminRootHandler = new AdminRootHandler(
+            adminNavigateInHandler,
+            adminNavigateOutHandler,
+            adminCommandHandler,
+        );
+
         // Root Handler
         const rootHandler = new RootHandler(
             reviewWordRootHandler,
             addWordRootHandler,
             wordReminderRootHandler,
             manageWordRootHandler,
+            adminRootHandler,
             commonRootHandler,
         );
 
@@ -267,7 +279,7 @@ export class Bot {
         this.gateway.configure();
 
         this.dailyCronJob = new CronJob(
-            '* * * * *',
+            '0 9 * * *',
             async () => {
                 const poolClient = await databaseManager.createTransaction();
                 await repository.card.updateAllDueDates(poolClient);

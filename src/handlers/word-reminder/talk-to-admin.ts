@@ -9,16 +9,18 @@ import { instanceToInstance } from 'class-transformer';
 
 export class WordReminderTalkToAdminHandler extends Handler {
     private grammyBot: GrammyBot;
+    private botConfig: BotConfig;
 
     public constructor(
         repository: Repository,
         frontend: Frontend,
-        botConfig: BotConfig,
         constant: Constant,
         grammyBot: GrammyBot,
+        botConfig: BotConfig,
     ) {
-        super(repository, frontend, botConfig, constant);
+        super(repository, frontend, constant);
         this.grammyBot = grammyBot;
+        this.botConfig = botConfig;
     }
 
     public async handle(requestContext: RequestContext): Promise<void> {

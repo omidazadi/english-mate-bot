@@ -4,6 +4,7 @@ import { PostgresConfig } from './postgres-config';
 import { BotConfig } from './bot-config';
 import { AgentConfig } from './agent-config';
 import { LoggerConfig } from './logger-config';
+import { ClassroomConfig } from './classroom-config';
 
 export class Config {
     @ValidateNested()
@@ -21,11 +22,15 @@ export class Config {
     @ValidateNested()
     public loggerConfig: LoggerConfig;
 
+    @ValidateNested()
+    public classroomConfig: ClassroomConfig;
+
     public constructor() {
         this.botConfig = new BotConfig();
         this.telegramConfig = new TelegramConfig();
         this.agentConfig = new AgentConfig();
         this.postgresConfig = new PostgresConfig();
         this.loggerConfig = new LoggerConfig();
+        this.classroomConfig = new ClassroomConfig();
     }
 }

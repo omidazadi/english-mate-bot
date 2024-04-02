@@ -1,0 +1,4 @@
+{% for row in result %}
+<b>{{ row[0] }}</b>:    {% if row[1] == 'too-many' %}❌ Too Many{% elif row[1] == 'duplicate' %}❌ Duplicate{% else %}✅ Added{% endif %}
+
+{% endfor %}

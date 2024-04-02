@@ -35,17 +35,21 @@ export class Agent {
                 this.constant.card.dailyReviews,
             );
             if (notification.noDues > 0) {
-                totalLearners += 1;
-                totalDues += notification.noDues;
-                await this.frontend.sendSystemMessage(
-                    notification.learnerTid,
-                    'review-notification',
-                    {
-                        context: {
-                            no_dues: notification.noDues,
+                if (
+                    await this.frontend.sendSystemMessage(
+                        notification.learnerTid,
+                        'review-notification',
+                        {
+                            context: {
+                                no_dues: notification.noDues,
+                            },
                         },
-                    },
-                );
+                    )
+                ) {
+                    totalLearners += 1;
+                    totalDues += notification.noDues;
+                }
+
                 await setTimeout(this.agentConfig.delay);
             }
         }

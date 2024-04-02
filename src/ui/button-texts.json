@@ -1,6 +1,7 @@
 {
     "command": {
-        "start": "/start"
+        "start": "/start",
+        "cli": "/cli"
     },
 
     "state": {
@@ -41,6 +42,9 @@
         },
         "delete_word": {
             "confirm": "Yes, I am sure 💔",
+            "back": "Back 🔙"
+        },
+        "cli": {
             "back": "Back 🔙"
         }
     },

@@ -9,10 +9,22 @@ export class Router {
 
     public route(requestContext: RequestContext): string {
         if (
-            requestContext.telegramContext.text ===
-            this.buttonTexts.command.start
+            requestContext.telegramContext.text?.startsWith(
+                this.buttonTexts.command.start,
+            )
         ) {
-            return 'word-reminder/jump';
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.command.start
+            ) {
+                return 'word-reminder/jump';
+            } else {
+                return 'add-word/public-bulk';
+            }
+        } else if (
+            requestContext.telegramContext.text === this.buttonTexts.command.cli
+        ) {
+            return 'admin/navigate-in';
         }
 
         if (requestContext.learner.data.state === 'word-reminder') {
@@ -139,14 +151,22 @@ export class Router {
                 this.buttonTexts.state.delete_word.back
             ) {
                 return 'manage-word/navigate-to-view';
-            }
-            if (
+            } else if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.delete_word.confirm
             ) {
                 return 'manage-word/delete';
             } else {
                 return 'common/unknown';
+            }
+        } else if (requestContext.learner.data.state === 'cli') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.cli.back
+            ) {
+                return 'admin/navigate-out';
+            } else {
+                return 'admin/command';
             }
         } else {
             return 'common/unknown';

@@ -62,6 +62,7 @@ export class ManageWordModifyHandler extends Handler {
                 requestContext.telegramContext.text,
                 requestContext.telegramContext.photo,
                 'private',
+                0,
                 requestContext.poolClient,
             );
             card = await this.repository.card.createCard(

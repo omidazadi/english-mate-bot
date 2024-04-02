@@ -31,7 +31,7 @@ export class Frontend {
             context?: object;
             photo?: string;
         },
-    ): Promise<void> {
+    ): Promise<boolean> {
         let context = this.buildHydratedContext(options);
         let text = nunjucks.render(
             `src/ui/action-views/${action}.njk`,
@@ -61,9 +61,12 @@ export class Frontend {
                     parse_mode: 'HTML',
                 });
             }
+
+            return true;
         } catch (e: unknown) {
             if (e instanceof GrammyError) {
                 await this.logger.warn(e.toString());
+                return false;
             } else {
                 throw e;
             }
@@ -77,7 +80,7 @@ export class Frontend {
             context?: object;
             photo?: string;
         },
-    ): Promise<void> {
+    ): Promise<boolean> {
         let context = this.buildHydratedContext(options);
         let text = nunjucks.render(
             `src/ui/system-views/${messageType}.njk`,
@@ -107,9 +110,12 @@ export class Frontend {
                     parse_mode: 'HTML',
                 });
             }
+
+            return true;
         } catch (e: unknown) {
             if (e instanceof GrammyError) {
                 await this.logger.warn(e.toString());
+                return false;
             } else {
                 throw e;
             }

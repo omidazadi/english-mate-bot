@@ -38,6 +38,7 @@ export class AddWordBackHandler extends Handler {
             requestContext.telegramContext.text,
             requestContext.telegramContext.photo,
             'private',
+            0,
             requestContext.poolClient,
         );
         await this.repository.card.createCard(
