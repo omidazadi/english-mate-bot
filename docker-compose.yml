@@ -13,10 +13,6 @@ services:
         volumes:
             - em-postgres-volume:/var/lib/postgresql/data
 
-networks:
-    payever-network:
-        name: payever-network
-
 volumes:
     em-postgres-volume:
         name: em-postgres-volume
