@@ -30,6 +30,7 @@ export namespace Learner {
         | 'word-reminder'
         | 'add-word-front'
         | 'add-word-back'
+        | 'show-public-definitions'
         | 'browse-word'
         | 'word-view'
         | 'modify-word'

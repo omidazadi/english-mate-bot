@@ -30,7 +30,23 @@ export class AdminCommandHandler extends Handler {
     public async handle(requestContext: RequestContext): Promise<void> {
         const tokens = this.parseCommand(requestContext.telegramContext.text);
 
-        if (tokens[0] === 'create-public') {
+        if (tokens[0] === 'version') {
+            if (tokens.length != 1) {
+                await this.error(requestContext);
+                return;
+            }
+
+            await this.frontend.sendActionMessage(
+                requestContext.learner.tid,
+                'admin/command',
+                {
+                    context: {
+                        scenario: 'version',
+                        version: this.botConfig.version,
+                    },
+                },
+            );
+        } else if (tokens[0] === 'create-public') {
             if (tokens.length != 2 && tokens.length != 3) {
                 await this.error(requestContext);
                 return;
@@ -204,7 +220,7 @@ export class AdminCommandHandler extends Handler {
                 { context: { scenario: 'done' } },
             );
         } else if (tokens[0] === 'publish') {
-            if (tokens.length === 1) {
+            if (tokens.length <= 2) {
                 await this.error(requestContext);
                 return;
             }
@@ -214,42 +230,30 @@ export class AdminCommandHandler extends Handler {
                 return;
             }
 
-            let wordSets: Array<Array<Word>> = [[]];
+            let wordSet: Array<Word> = [];
 
-            for (let index = 1; index < tokens.length; index += 1) {
-                if (tokens[index] === '*') {
-                    wordSets.push([]);
-                } else {
-                    const word =
-                        await this.repository.word.getPublicWordByFront(
-                            tokens[index],
-                            requestContext.poolClient,
-                        );
-                    if (word === null) {
-                        await this.error(requestContext);
-                        return;
-                    }
-
-                    wordSets[wordSets.length - 1].push(word);
-                }
-            }
-
-            for (const wordSet of wordSets) {
-                if (wordSet.length === 0) {
+            for (let index = 2; index < tokens.length; index += 1) {
+                const word = await this.repository.word.getPublicWordByFront(
+                    tokens[index],
+                    requestContext.poolClient,
+                );
+                if (word === null) {
                     await this.error(requestContext);
                     return;
                 }
 
-                const latestTag = await this.repository.word.getLatestTag(
+                wordSet.push(word);
+            }
+
+            const latestTag = await this.repository.word.getLatestTag(
+                requestContext.poolClient,
+            );
+            for (const word of wordSet) {
+                word.tag = latestTag + 1;
+                await this.repository.word.updateWord(
+                    word,
                     requestContext.poolClient,
                 );
-                for (const word of wordSet) {
-                    word.tag = latestTag + 1;
-                    await this.repository.word.updateWord(
-                        word,
-                        requestContext.poolClient,
-                    );
-                }
             }
 
             const classroomTid = (
@@ -262,11 +266,12 @@ export class AdminCommandHandler extends Handler {
                 'classroom-notes',
                 {
                     context: {
+                        resource: tokens[1],
                         bot_username: this.botConfig.username.slice(
                             1,
                             this.botConfig.username.length,
                         ),
-                        word_sets: wordSets,
+                        word_set: wordSet,
                     },
                 },
             );
@@ -297,8 +302,8 @@ export class AdminCommandHandler extends Handler {
         let result: Array<string> = [];
         let current: string | null = null;
         let isMultiLine = false;
-        const multiLineBegin = '[';
-        const multiLineEnd = ']';
+        const multiLineBegin = '{';
+        const multiLineEnd = '}';
 
         for (let char of command) {
             if (current === null) {

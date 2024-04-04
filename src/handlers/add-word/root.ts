@@ -3,27 +3,31 @@ import { AddWordBackHandler } from './back';
 import { AddWordFrontHandler } from './front';
 import { AddWordNavigateInHandler } from './navigate-in';
 import { AddWordNavigateOutHandler } from './navigate-out';
-import { AddWordPublicBulkHandler } from './public-bulk';
+import { AddWordPublicBulkAddHandler } from './public-bulk-add';
+import { AddWordPublicBulkShowHandler } from './public-bulk-show';
 
 export class AddWordRootHandler {
     private navigateInHandler: AddWordNavigateInHandler;
     private navigateOutHandler: AddWordNavigateOutHandler;
     private frontHandler: AddWordFrontHandler;
     private backHandler: AddWordBackHandler;
-    private publicBulkHandler: AddWordPublicBulkHandler;
+    private publicBulkShowHandler: AddWordPublicBulkShowHandler;
+    private publicBulkAddHandler: AddWordPublicBulkAddHandler;
 
     public constructor(
         navigateInHandler: AddWordNavigateInHandler,
         navigateOutHandler: AddWordNavigateOutHandler,
         frontHandler: AddWordFrontHandler,
         backHandler: AddWordBackHandler,
-        publicBulkHandler: AddWordPublicBulkHandler,
+        publicBulkShowHandler: AddWordPublicBulkShowHandler,
+        publicBulkAddHandler: AddWordPublicBulkAddHandler,
     ) {
         this.navigateInHandler = navigateInHandler;
         this.navigateOutHandler = navigateOutHandler;
         this.frontHandler = frontHandler;
         this.backHandler = backHandler;
-        this.publicBulkHandler = publicBulkHandler;
+        this.publicBulkShowHandler = publicBulkShowHandler;
+        this.publicBulkAddHandler = publicBulkAddHandler;
     }
 
     public async handle(
@@ -38,8 +42,10 @@ export class AddWordRootHandler {
             await this.frontHandler.handle(requestContext);
         } else if (path === 'back') {
             await this.backHandler.handle(requestContext);
-        } else if (path === 'public-bulk') {
-            await this.publicBulkHandler.handle(requestContext);
+        } else if (path === 'public-bulk-show') {
+            await this.publicBulkShowHandler.handle(requestContext);
+        } else if (path === 'public-bulk-add') {
+            await this.publicBulkAddHandler.handle(requestContext);
         }
     }
 }

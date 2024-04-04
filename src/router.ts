@@ -9,18 +9,16 @@ export class Router {
 
     public route(requestContext: RequestContext): string {
         if (
+            requestContext.telegramContext.text ===
+            this.buttonTexts.command.start
+        ) {
+            return 'word-reminder/jump';
+        } else if (
             requestContext.telegramContext.text?.startsWith(
-                this.buttonTexts.command.start,
+                this.buttonTexts.command.start + ' ',
             )
         ) {
-            if (
-                requestContext.telegramContext.text ===
-                this.buttonTexts.command.start
-            ) {
-                return 'word-reminder/jump';
-            } else {
-                return 'add-word/public-bulk';
-            }
+            return 'add-word/public-bulk-show';
         } else if (
             requestContext.telegramContext.text === this.buttonTexts.command.cli
         ) {
@@ -73,6 +71,22 @@ export class Router {
                 return 'add-word/navigate-out';
             } else {
                 return 'add-word/back';
+            }
+        } else if (
+            requestContext.learner.data.state === 'show-public-definitions'
+        ) {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.show_public_definitions.yes
+            ) {
+                return 'add-word/public-bulk-add';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.show_public_definitions.back
+            ) {
+                return 'add-word/navigate-out';
+            } else {
+                return 'common/unknown';
             }
         } else if (requestContext.learner.data.state === 'review-word') {
             if (

@@ -43,7 +43,8 @@ import { AdminNavigateInHandler } from './handlers/admin/navigate-in';
 import { AdminNavigateOutHandler } from './handlers/admin/navigate-out';
 import { AdminCommandHandler } from './handlers/admin/command';
 import { AdminRootHandler } from './handlers/admin/root';
-import { AddWordPublicBulkHandler } from './handlers/add-word/public-bulk';
+import { AddWordPublicBulkAddHandler } from './handlers/add-word/public-bulk-add';
+import { AddWordPublicBulkShowHandler } from './handlers/add-word/public-bulk-show';
 
 export class Bot {
     private gateway: Gateway | undefined;
@@ -122,7 +123,12 @@ export class Bot {
             frontend,
             constant,
         );
-        const addWordPublicBulkHandler = new AddWordPublicBulkHandler(
+        const addWordPublicBulkShowHandler = new AddWordPublicBulkShowHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const addWordPublicBulkAddHandler = new AddWordPublicBulkAddHandler(
             repository,
             frontend,
             constant,
@@ -132,7 +138,8 @@ export class Bot {
             addWordNavigateOutHandler,
             addWordFrontHandler,
             addWordBackHandler,
-            addWordPublicBulkHandler,
+            addWordPublicBulkShowHandler,
+            addWordPublicBulkAddHandler,
         );
 
         // Word Reminder Handlers

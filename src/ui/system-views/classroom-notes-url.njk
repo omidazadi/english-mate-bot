@@ -1,12 +1,8 @@
 [
-    {% for word_set in word_sets %}
     [
         {
-            "text": "Add Set {{ loop.index }} to Reminder",
+            "text": "See Definitions",
             "url": "https://telegram.me/{{ bot_username }}?start={{ (word_set | first).tag }}"
         }
-    ]{% if not loop.last %},{% endif %}
-    {% endfor %}
+    ]
 ]
-
-{# {% for word in word_set %}{{ word.id }}{% if not loop.last %},{% endif %}{% endfor %} #}

@@ -1,5 +1,5 @@
-{% for word_set in word_sets %}
-<b>Set {{ loop.index }}</b>: {% for word in word_set %}{{ word.front }}{% if not loop.last %}, {% endif %}{% endfor %}
+Today's words from <b>{{ resource }}</b>:
 
-
+{% for word in word_set %}
+{{ loop.index }}: {{ word.front }}
 {% endfor %}

@@ -4,12 +4,10 @@ import { RequestContext } from '../../context/request-context';
 import { Handler } from '../handler';
 import { setTimeout } from 'timers/promises';
 
-export class AddWordPublicBulkHandler extends Handler {
+export class AddWordPublicBulkAddHandler extends Handler {
     public async handle(requestContext: RequestContext): Promise<void> {
         const wordSet = await this.repository.word.getPublicWordSet(
-            parseInt(
-                (requestContext.telegramContext.text as string).split(' ')[1],
-            ),
+            requestContext.learner.data.wordSet,
             requestContext.poolClient,
         );
         if (wordSet.length === 0) {
@@ -63,7 +61,7 @@ export class AddWordPublicBulkHandler extends Handler {
         if (result.length > 0) {
             await this.frontend.sendActionMessage(
                 requestContext.learner.tid,
-                'add-word/public-bulk',
+                'add-word/public-bulk-add',
                 { context: { result: result, land: true } },
             );
         }
