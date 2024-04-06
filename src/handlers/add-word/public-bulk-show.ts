@@ -33,12 +33,11 @@ export class AddWordPublicBulkShowHandler extends Handler {
                 {
                     photo: word.media === null ? undefined : word.media,
                     context: {
-                        front: word.front,
-                        back: word.back,
+                        word: word,
                     },
                 },
             );
-            await setTimeout(this.constant.bulk.bulkWordPreviewDelay);
+            await setTimeout(this.constant.ux.consecutiveMessageDelay);
         }
 
         const learner = instanceToInstance(requestContext.learner);

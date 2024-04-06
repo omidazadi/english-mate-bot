@@ -5,6 +5,7 @@ export class Word {
     public media: string | null;
     public accessType: 'public' | 'paid' | 'private';
     public tag: number;
+    public deck: string | null;
 
     public constructor(
         id: number,
@@ -13,6 +14,7 @@ export class Word {
         media: string | null,
         accessType: 'public' | 'paid' | 'private',
         tag: number,
+        deck: string | null,
     ) {
         this.id = id;
         this.front = front;
@@ -20,5 +22,6 @@ export class Word {
         this.media = media;
         this.accessType = accessType;
         this.tag = tag;
+        this.deck = deck;
     }
 }

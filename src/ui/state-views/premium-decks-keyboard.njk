@@ -1,0 +1,10 @@
+[
+    {% for deck in decks %}
+    [
+        "{{ deck.fullName }}"
+    ],
+    {% endfor %}
+    [
+        "{{ buttonTexts.state.premium_decks.back }}"
+    ]
+]

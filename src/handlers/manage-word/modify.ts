@@ -63,6 +63,7 @@ export class ManageWordModifyHandler extends Handler {
                 requestContext.telegramContext.photo,
                 'private',
                 0,
+                null,
                 requestContext.poolClient,
             );
             card = await this.repository.card.createCard(
@@ -87,8 +88,7 @@ export class ManageWordModifyHandler extends Handler {
                 photo: word.media === null ? undefined : word.media,
                 context: {
                     scenario: 'success',
-                    front: word.front,
-                    back: word.back,
+                    word: word,
                 },
             },
         );

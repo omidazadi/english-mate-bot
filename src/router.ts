@@ -48,6 +48,11 @@ export class Router {
                 return 'word-reminder/statistics';
             } else if (
                 requestContext.telegramContext.text ===
+                this.buttonTexts.state.word_reminder.premium_decks
+            ) {
+                return 'premium/navigate-in';
+            } else if (
+                requestContext.telegramContext.text ===
                 this.buttonTexts.state.word_reminder.talk_to_admin
             ) {
                 return 'word-reminder/talk-to-admin';
@@ -172,6 +177,15 @@ export class Router {
                 return 'manage-word/delete';
             } else {
                 return 'common/unknown';
+            }
+        } else if (requestContext.learner.data.state === 'premium-decks') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.premium_decks.back
+            ) {
+                return 'premium/navigate-out';
+            } else {
+                return 'premium/details';
             }
         } else if (requestContext.learner.data.state === 'cli') {
             if (

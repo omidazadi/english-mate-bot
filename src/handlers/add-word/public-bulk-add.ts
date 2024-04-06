@@ -27,7 +27,7 @@ export class AddWordPublicBulkAddHandler extends Handler {
                     'add-word/public-bulk',
                     { context: { result: result, land: false } },
                 );
-                await setTimeout(this.constant.bulk.bulkPageDelay);
+                await setTimeout(this.constant.ux.consecutiveMessageDelay);
                 result = [];
             }
 

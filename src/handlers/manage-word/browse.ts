@@ -50,8 +50,7 @@ export class ManageWordBrowseHandler extends Handler {
                 photo: word.media === null ? undefined : word.media,
                 context: {
                     scenario: 'success',
-                    front: word.front,
-                    back: word.back,
+                    word: word,
                 },
             },
         );

@@ -92,6 +92,9 @@ export class CardRepository {
                 owner = $1
                     AND
                 is_due = TRUE
+            ORDER BY
+                fsrs_info->'state'
+                    DESC
             LIMIT 1
             `,
             [owner],
@@ -190,6 +193,61 @@ export class CardRepository {
         );
 
         return result.rows[0].no_all_cards;
+    }
+
+    public async grantDeckCardsToLearner(
+        learnedId: number,
+        deckName: string,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            INSERT
+            INTO card (owner, word, fsrs_info, is_due) (
+                SELECT $1, word.id, $3, $4
+                FROM word
+                WHERE 
+                    word.deck = $2
+                        AND
+                    NOT EXISTS (
+                        SELECT 1
+                        FROM card cc JOIN word ww on cc.word = ww.id
+                        WHERE
+                            cc.owner = $1
+                                AND
+                            ww.front = word.front
+                    )
+            )
+            ON CONFLICT
+                DO NOTHING
+            `,
+            [learnedId, deckName, new FSRSCard(), true],
+        );
+    }
+
+    public async denyDeckCardsFromLearner(
+        learnedId: number,
+        deckName: string,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            DELETE
+            FROM card
+            WHERE
+                owner = $1
+                    AND
+                EXISTS (
+                    SELECT 1
+                    FROM word
+                    WHERE
+                        word.deck = $2
+                            AND
+                        word.id = card.word
+                )
+            `,
+            [learnedId, deckName],
+        );
     }
 
     private bake(row: any): Card {

@@ -23,6 +23,26 @@ export class LearnerRepository {
         return this.bake(result.rows[0]);
     }
 
+    public async getLearnerByTid(
+        tid: string,
+        poolClient: PoolClient,
+    ): Promise<Learner | null> {
+        const result = await poolClient.query(
+            `
+            SELECT *
+            FROM learner
+            WHERE tid = $1
+            `,
+            [tid],
+        );
+
+        if (result.rowCount === 0) {
+            return null;
+        }
+
+        return this.bake(result.rows[0]);
+    }
+
     public async createLearner(
         tid: string,
         data: Learner.Data,

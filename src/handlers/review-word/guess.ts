@@ -4,6 +4,7 @@ import { Card } from '../../database/models/card';
 import { Handler } from '../handler';
 import { instanceToInstance } from 'class-transformer';
 import { Word } from '../../database/models/word';
+import { setTimeout } from 'timers/promises';
 
 export class ReviewWordGuessHandler extends Handler {
     public async handle(requestContext: RequestContext): Promise<void> {
@@ -55,11 +56,11 @@ export class ReviewWordGuessHandler extends Handler {
             {
                 photo: word.media === null ? undefined : word.media,
                 context: {
-                    front: word.front,
-                    back: word.back,
+                    word: word,
                 },
             },
         );
+        await setTimeout(this.constant.ux.consecutiveMessageDelay);
         await this.frontend.sendActionMessage(
             requestContext.learner.tid,
             'review-word/guess',

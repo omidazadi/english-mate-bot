@@ -45,6 +45,10 @@ import { AdminCommandHandler } from './handlers/admin/command';
 import { AdminRootHandler } from './handlers/admin/root';
 import { AddWordPublicBulkAddHandler } from './handlers/add-word/public-bulk-add';
 import { AddWordPublicBulkShowHandler } from './handlers/add-word/public-bulk-show';
+import { PremiumNavigateInHandler } from './handlers/premium/navigate-in';
+import { PremiumNavigateOutHandler } from './handlers/premium/navigate-out';
+import { PremiumDetailsHandler } from './handlers/premium/details';
+import { PremiumRootHandler } from './handlers/premium/root';
 
 export class Bot {
     private gateway: Gateway | undefined;
@@ -265,6 +269,30 @@ export class Bot {
             adminCommandHandler,
         );
 
+        // Admin Handlers
+        const premiumNavigateInHandler = new PremiumNavigateInHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const premiumNavigateOutHandler = new PremiumNavigateOutHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const premiumDetailsHandler = new PremiumDetailsHandler(
+            repository,
+            frontend,
+            constant,
+            grammyBot,
+            config.botConfig,
+        );
+        const premiumRootHandler = new PremiumRootHandler(
+            premiumNavigateInHandler,
+            premiumNavigateOutHandler,
+            premiumDetailsHandler,
+        );
+
         // Root Handler
         const rootHandler = new RootHandler(
             reviewWordRootHandler,
@@ -272,6 +300,7 @@ export class Bot {
             wordReminderRootHandler,
             manageWordRootHandler,
             adminRootHandler,
+            premiumRootHandler,
             commonRootHandler,
         );
 

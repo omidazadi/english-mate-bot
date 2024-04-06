@@ -37,6 +37,7 @@ export namespace Learner {
         | 'delete-word'
         | 'review-word'
         | 'rate-word'
+        | 'premium-decks'
         | 'cli';
 
     export type Data = {

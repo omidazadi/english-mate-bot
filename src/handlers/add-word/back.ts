@@ -39,6 +39,7 @@ export class AddWordBackHandler extends Handler {
             requestContext.telegramContext.photo,
             'private',
             0,
+            null,
             requestContext.poolClient,
         );
         await this.repository.card.createCard(
@@ -65,8 +66,7 @@ export class AddWordBackHandler extends Handler {
                         ? undefined
                         : requestContext.telegramContext.photo,
                 context: {
-                    front: requestContext.learner.data.front,
-                    back: requestContext.telegramContext.text,
+                    word: word,
                 },
             },
         );

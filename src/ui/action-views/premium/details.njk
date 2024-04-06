@@ -1,0 +1,11 @@
+{% if scenario == 'error-does-not-exist' %}
+Deck you entered does not exist.
+{% elif scenario == 'description' %}
+{% include "../common/deck-preview.njk" %}
+{% elif scenario == 'example-prelude' %}
+Here is an example card from this deck:
+{% elif scenario == 'example' %}
+{% include "../common/word-preview.njk" %}
+{% elif scenario == 'contact-admin' %}
+To buy and activate this deck, contact admin at @{{ admin_username }}.
+{% endif %}

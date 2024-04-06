@@ -10,6 +10,7 @@
             "add": "Add a Word 🇦 🇧 🇨",
             "manage": "Manage Your Words 💼",
             "statistics": "See Statistics 📊",
+            "premium_decks": "Premium Decks 💎",
             "talk_to_admin": "Talk to Admin 💻"
         },
         "add_word_front": {
@@ -46,6 +47,9 @@
         },
         "delete_word": {
             "confirm": "Yes, I am sure 💔",
+            "back": "Back 🔙"
+        },
+        "premium_decks": {
             "back": "Back 🔙"
         },
         "cli": {
