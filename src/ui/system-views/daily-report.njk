@@ -1,8 +1,13 @@
 {% extends "./base-log.njk" %}
 
 {% block log_message %}
-Sent {{ total_notifications }} daily notifications. 
-                    
+<b>Daily Report</b>
+
+Notifications: {{ total_notifications }}
 Total Cards: {{ total_cards }}
+    - New: {{ new_cards }}
+    - Learning: {{ learning_cards }}
+    - Review: {{ review_cards }}
+    - Relearning: {{ relearning_cards }}
 Cards due for today: {{ total_dues }}
 {% endblock %}

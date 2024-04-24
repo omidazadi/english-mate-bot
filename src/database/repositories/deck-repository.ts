@@ -8,17 +8,19 @@ export class DeckRepository {
         description: string,
         exampleWord: number | null,
         status: 'online' | 'offline',
+        level: string,
+        price: number,
         poolClient: PoolClient,
     ): Promise<Deck> {
         const result = await poolClient.query(
             `
             INSERT INTO
-            deck (name, full_name, description, example_word, status)
+            deck (name, full_name, description, example_word, status, level, price)
             VALUES
-                ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *
             `,
-            [name, fullName, description, exampleWord, status],
+            [name, fullName, description, exampleWord, status, level, price],
         );
 
         return this.bake(result.rows[0]);
@@ -68,7 +70,7 @@ export class DeckRepository {
         await poolClient.query(
             `
             UPDATE deck
-            SET full_name = $2, description = $3, example_word = $4, status = $5
+            SET full_name = $2, description = $3, example_word = $4, status = $5, level = $6, price = $7
             WHERE name = $1
             `,
             [
@@ -77,6 +79,8 @@ export class DeckRepository {
                 deck.description,
                 deck.exampleWord,
                 deck.status,
+                deck.level,
+                deck.price,
             ],
         );
     }
@@ -114,6 +118,8 @@ export class DeckRepository {
             row.description,
             row.example_word,
             row.status,
+            row.level,
+            row.price,
         );
     }
 }

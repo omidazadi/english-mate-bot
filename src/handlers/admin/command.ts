@@ -380,7 +380,7 @@ export class AdminCommandHandler extends Handler {
         tokens: Array<string>,
         requestContext: RequestContext,
     ): Promise<void> {
-        if (tokens.length != 4) {
+        if (tokens.length != 6) {
             await this.error(requestContext);
             return;
         }
@@ -413,6 +413,18 @@ export class AdminCommandHandler extends Handler {
             return;
         }
 
+        if (
+            Buffer.byteLength(tokens[4], 'utf8') > this.constant.deck.levelSize
+        ) {
+            await this.error(requestContext);
+            return;
+        }
+
+        if (isNaN(parseInt(tokens[5]))) {
+            await this.error(requestContext);
+            return;
+        }
+
         let deck = await this.repository.deck.getDeck(
             tokens[1],
             requestContext.poolClient,
@@ -439,6 +451,8 @@ export class AdminCommandHandler extends Handler {
             tokens[3],
             null,
             'offline',
+            tokens[4],
+            parseInt(tokens[5]),
             requestContext.poolClient,
         );
 
@@ -493,7 +507,7 @@ export class AdminCommandHandler extends Handler {
         tokens: Array<string>,
         requestContext: RequestContext,
     ): Promise<void> {
-        if (tokens.length != 4) {
+        if (tokens.length != 6) {
             await this.error(requestContext);
             return;
         }
@@ -529,6 +543,18 @@ export class AdminCommandHandler extends Handler {
             return;
         }
 
+        if (
+            Buffer.byteLength(tokens[4], 'utf8') > this.constant.deck.levelSize
+        ) {
+            await this.error(requestContext);
+            return;
+        }
+
+        if (isNaN(parseInt(tokens[5]))) {
+            await this.error(requestContext);
+            return;
+        }
+
         const tempDeck = await this.repository.deck.getDeckByFullName(
             tokens[2],
             requestContext.poolClient,
@@ -540,6 +566,8 @@ export class AdminCommandHandler extends Handler {
 
         deck.fullName = tokens[2];
         deck.description = tokens[3];
+        deck.level = tokens[4];
+        deck.price = parseInt(tokens[5]);
         await this.repository.deck.updateDeck(deck, requestContext.poolClient);
 
         await this.frontend.sendActionMessage(
@@ -1140,7 +1168,7 @@ export class AdminCommandHandler extends Handler {
             }
         }
 
-        if (current !== null) {
+        if (current !== null && !isMultiLine) {
             result.push(current.trim());
         }
 

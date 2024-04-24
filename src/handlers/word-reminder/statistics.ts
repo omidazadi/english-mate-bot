@@ -8,9 +8,18 @@ export class WordReminderStatisticsHandler extends Handler {
             requestContext.learner.id,
             requestContext.poolClient,
         );
-        const noDueCards = await this.repository.card.getNoDueCards(
+        const noCardsByState = await this.repository.card.getNoCardsByState(
             requestContext.learner.id,
             requestContext.poolClient,
+        );
+        let noDueCards = await this.repository.card.getNoDueCards(
+            requestContext.learner.id,
+            requestContext.poolClient,
+        );
+        noDueCards = Math.min(
+            noDueCards,
+            requestContext.learner.maximumDailyReviews -
+                requestContext.learner.dailyReviews,
         );
 
         const learner = instanceToInstance(requestContext.learner);
@@ -22,7 +31,16 @@ export class WordReminderStatisticsHandler extends Handler {
         await this.frontend.sendActionMessage(
             requestContext.learner.tid,
             'word-reminder/statistics',
-            { context: { no_cards: noCards, no_due_cards: noDueCards } },
+            {
+                context: {
+                    no_cards: noCards,
+                    new_cards: noCardsByState[0],
+                    learning_cards: noCardsByState[1],
+                    review_cards: noCardsByState[2],
+                    relearning_cards: noCardsByState[3],
+                    no_due_cards: noDueCards,
+                },
+            },
         );
     }
 }

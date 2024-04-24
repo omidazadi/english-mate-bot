@@ -18,6 +18,7 @@ DO $$
     );
     DECLARE v0_1_0 VARCHAR(20) := '000.010.000';
     DECLARE v0_3_0 VARCHAR(20) := '000.030.000';
+    DECLARE v0_4_0 VARCHAR(20) := '000.040.000';
 
     BEGIN
         -- v0.1.0
@@ -83,6 +84,21 @@ DO $$
 
             UPDATE meta_data
             SET meta_value = v0_3_0
+            WHERE meta_key = 'version';
+        END IF;
+
+        -- v0.4.0
+        IF version < v0_4_0 THEN
+            ALTER TABLE learner
+            ADD COLUMN maximum_daily_reviews INTEGER NOT NULL DEFAULT 20,
+            ADD COLUMN is_muted BOOLEAN NOT NULL DEFAULT FALSE;
+
+            ALTER TABLE deck
+            ADD COLUMN level VARCHAR(64) NOT NULL DEFAULT '',
+            ADD COLUMN price INTEGER NOT NULL DEFAULT 0;
+
+            UPDATE meta_data
+            SET meta_value = v0_4_0
             WHERE meta_key = 'version';
         END IF;
     END

@@ -110,7 +110,7 @@ export class CardRepository {
     public async getNoCards(
         owner: number,
         poolClient: PoolClient,
-    ): Promise<Card | null> {
+    ): Promise<number> {
         const result = await poolClient.query(
             `
             SELECT COUNT(*) as no_cards
@@ -123,10 +123,35 @@ export class CardRepository {
         return result.rows[0].no_cards;
     }
 
+    public async getNoCardsByState(
+        owner: number,
+        poolClient: PoolClient,
+    ): Promise<[number, number, number, number]> {
+        const result = await poolClient.query(
+            `
+            SELECT
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 0 THEN 1 END) as new_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 1 THEN 1 END) as learning_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 2 THEN 1 END) as review_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 3 THEN 1 END) as relearning_cards
+            FROM card
+            WHERE owner = $1
+            `,
+            [owner],
+        );
+
+        return [
+            result.rows[0].new_cards,
+            result.rows[0].learning_cards,
+            result.rows[0].review_cards,
+            result.rows[0].relearning_cards,
+        ];
+    }
+
     public async getNoDueCards(
         owner: number,
         poolClient: PoolClient,
-    ): Promise<Card | null> {
+    ): Promise<number> {
         const result = await poolClient.query(
             `
             SELECT COUNT(*) as no_due_cards
@@ -193,6 +218,28 @@ export class CardRepository {
         );
 
         return result.rows[0].no_all_cards;
+    }
+
+    public async getNoAllCardsByState(
+        poolClient: PoolClient,
+    ): Promise<[number, number, number, number]> {
+        const result = await poolClient.query(
+            `
+            SELECT
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 0 THEN 1 END) as new_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 1 THEN 1 END) as learning_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 2 THEN 1 END) as review_cards, 
+                COUNT(CASE WHEN (fsrs_info->>'state')::INTEGER = 3 THEN 1 END) as relearning_cards
+            FROM card
+            `,
+        );
+
+        return [
+            result.rows[0].new_cards,
+            result.rows[0].learning_cards,
+            result.rows[0].review_cards,
+            result.rows[0].relearning_cards,
+        ];
     }
 
     public async grantDeckCardsToLearner(

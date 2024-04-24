@@ -5,6 +5,8 @@ export class Learner {
     public accessLevel: Learner.AccessLevel;
     public dailyReviews: number;
     public dailyAddedCards: number;
+    public maximumDailyReviews: number;
+    public isMuted: boolean;
 
     public constructor(
         id: number,
@@ -13,6 +15,8 @@ export class Learner {
         accessLevel: Learner.AccessLevel,
         dailyReviews: number,
         dailyAddedCards: number,
+        maximumDailyReviews: number,
+        isMuted: boolean,
     ) {
         this.id = id;
         this.tid = tid;
@@ -20,6 +24,8 @@ export class Learner {
         this.accessLevel = accessLevel;
         this.dailyReviews = dailyReviews;
         this.dailyAddedCards = dailyAddedCards;
+        this.maximumDailyReviews = maximumDailyReviews;
+        this.isMuted = isMuted;
     }
 }
 
@@ -38,6 +44,8 @@ export namespace Learner {
         | 'review-word'
         | 'rate-word'
         | 'premium-decks'
+        | 'settings'
+        | 'modify-maximum-reviews'
         | 'cli';
 
     export type Data = {

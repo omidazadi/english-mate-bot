@@ -57,6 +57,7 @@ export class Logger {
     public async dailyReport(
         totalNotifications: number,
         totalCards: number,
+        totalCardsByState: [number, number, number, number],
         totalDues: number,
     ) {
         if (typeof this.frontend === 'undefined') {
@@ -70,6 +71,10 @@ export class Logger {
                 context: {
                     total_notifications: totalNotifications,
                     total_cards: totalCards,
+                    new_cards: totalCardsByState[0],
+                    learning_cards: totalCardsByState[1],
+                    review_cards: totalCardsByState[2],
+                    relearning_cards: totalCardsByState[3],
                     total_dues: totalDues,
                     severity: 'log',
                     date: new Date().toLocaleString('en-US', {

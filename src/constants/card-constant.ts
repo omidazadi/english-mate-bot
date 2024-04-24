@@ -3,13 +3,15 @@ export class CardConstant {
     public backSizePlain: number;
     public backSizeMedia: number;
     public dailyAddedCards: number;
-    public dailyReviews: number;
+    public minumumDailyReviews: number;
+    public maximumDailyReviews: number;
 
     public constructor() {
         this.frontSize = 128;
         this.backSizePlain = 1024;
         this.backSizeMedia = 512;
         this.dailyAddedCards = 50;
-        this.dailyReviews = 20;
+        this.minumumDailyReviews = 1;
+        this.maximumDailyReviews = 100;
     }
 }

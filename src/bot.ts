@@ -49,6 +49,13 @@ import { PremiumNavigateInHandler } from './handlers/premium/navigate-in';
 import { PremiumNavigateOutHandler } from './handlers/premium/navigate-out';
 import { PremiumDetailsHandler } from './handlers/premium/details';
 import { PremiumRootHandler } from './handlers/premium/root';
+import { SettingsNavigateInHandler } from './handlers/settings/navigate-in';
+import { SettingsNavigateOutHandler } from './handlers/settings/navigate-out';
+import { SettingsNavigateToSetMaximumHandler } from './handlers/settings/navigate-to-set-maximum';
+import { SettingsNavigateToSettingsHandler } from './handlers/settings/navigate-to-settings';
+import { SettingsSetMaximumReviewsHandler } from './handlers/settings/set-maximum-reviews';
+import { SettingsSetMutedUnmutedHandler } from './handlers/settings/set-muted-unmuted';
+import { SettingsRootHandler } from './handlers/settings/root';
 
 export class Bot {
     private gateway: Gateway | undefined;
@@ -75,7 +82,12 @@ export class Bot {
             config.botConfig,
         );
         const router = new Router(buttonTexts);
-        const agent = new Agent(frontend, config.agentConfig, constant);
+        const agent = new Agent(
+            frontend,
+            repository,
+            config.agentConfig,
+            config.botConfig,
+        );
 
         // Review Word Handlers
         const reviewWordGuessHandler = new ReviewWordGuessHandler(
@@ -269,7 +281,7 @@ export class Bot {
             adminCommandHandler,
         );
 
-        // Admin Handlers
+        // Premium Handlers
         const premiumNavigateInHandler = new PremiumNavigateInHandler(
             repository,
             frontend,
@@ -293,6 +305,51 @@ export class Bot {
             premiumDetailsHandler,
         );
 
+        // Settings Handlers
+        const settingsNavigateInHandler = new SettingsNavigateInHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const settingsNavigateOutHandler = new SettingsNavigateOutHandler(
+            repository,
+            frontend,
+            constant,
+        );
+        const settingsNavigateToSetMaximumHandler =
+            new SettingsNavigateToSetMaximumHandler(
+                repository,
+                frontend,
+                constant,
+            );
+        const settingsNavigateToSettingsHandler =
+            new SettingsNavigateToSettingsHandler(
+                repository,
+                frontend,
+                constant,
+            );
+        const settingsSetMaximumReviewsHandler =
+            new SettingsSetMaximumReviewsHandler(
+                repository,
+                frontend,
+                constant,
+            );
+        const settingsSetMutedUnmutedHandler =
+            new SettingsSetMutedUnmutedHandler(
+                repository,
+                frontend,
+                constant,
+                buttonTexts,
+            );
+        const settingsRootHandler = new SettingsRootHandler(
+            settingsNavigateInHandler,
+            settingsNavigateOutHandler,
+            settingsNavigateToSetMaximumHandler,
+            settingsNavigateToSettingsHandler,
+            settingsSetMaximumReviewsHandler,
+            settingsSetMutedUnmutedHandler,
+        );
+
         // Root Handler
         const rootHandler = new RootHandler(
             reviewWordRootHandler,
@@ -301,6 +358,7 @@ export class Bot {
             manageWordRootHandler,
             adminRootHandler,
             premiumRootHandler,
+            settingsRootHandler,
             commonRootHandler,
         );
 
@@ -325,18 +383,25 @@ export class Bot {
                 const totalCards = await repository.card.getNoAllCards(
                     poolClient,
                 );
+                const totalCardsByState =
+                    await repository.card.getNoAllCardsByState(poolClient);
                 await databaseManager.commitTransaction(poolClient);
 
+                const notificationPoolClient =
+                    await databaseManager.createTransaction();
                 const [totalNotifications, totalDues] =
                     await agent.sendReviewNotificationBatch(
                         notificationData.map((value: [string, number]) => {
                             return { learnerTid: value[0], noDues: value[1] };
                         }),
+                        notificationPoolClient,
                     );
+                await databaseManager.commitTransaction(notificationPoolClient);
 
                 await this.logger?.dailyReport(
                     totalNotifications,
                     totalCards,
+                    totalCardsByState,
                     totalDues,
                 );
             },

@@ -5,6 +5,7 @@ import { CommonRootHandler } from './common/root';
 import { ManageWordRootHandler } from './manage-word/root';
 import { PremiumRootHandler } from './premium/root';
 import { ReviewWordRootHandler } from './review-word/root';
+import { SettingsRootHandler } from './settings/root';
 import { WordReminderRootHandler } from './word-reminder/root';
 
 export class RootHandler {
@@ -14,6 +15,7 @@ export class RootHandler {
     private manageWordRootHandler: ManageWordRootHandler;
     private adminRootHandler: AdminRootHandler;
     private premiumRootHandler: PremiumRootHandler;
+    private settingsRootHandler: SettingsRootHandler;
     private commonRootHandler: CommonRootHandler;
 
     public constructor(
@@ -23,6 +25,7 @@ export class RootHandler {
         manageWordRootHandler: ManageWordRootHandler,
         adminRootHandler: AdminRootHandler,
         premiumRootHandler: PremiumRootHandler,
+        settingsRootHandler: SettingsRootHandler,
         commonRootHandler: CommonRootHandler,
     ) {
         this.reviewWordRootHandler = reviewWordRootHandler;
@@ -31,6 +34,7 @@ export class RootHandler {
         this.manageWordRootHandler = manageWordRootHandler;
         this.adminRootHandler = adminRootHandler;
         this.premiumRootHandler = premiumRootHandler;
+        this.settingsRootHandler = settingsRootHandler;
         this.commonRootHandler = commonRootHandler;
     }
 
@@ -52,6 +56,8 @@ export class RootHandler {
             await this.adminRootHandler.handle(nextPath, requestContext);
         } else if (splittedPath[0] === 'premium') {
             await this.premiumRootHandler.handle(nextPath, requestContext);
+        } else if (splittedPath[0] === 'settings') {
+            await this.settingsRootHandler.handle(nextPath, requestContext);
         } else if (splittedPath[0] === 'common') {
             await this.commonRootHandler.handle(nextPath, requestContext);
         }

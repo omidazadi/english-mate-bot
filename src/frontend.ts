@@ -1,4 +1,4 @@
-import { readFile, stat } from 'fs/promises';
+import { stat } from 'fs/promises';
 import {
     Bot as GrammyBot,
     GrammyError,
@@ -136,7 +136,16 @@ export class Frontend {
     private async buildButtons(
         prefixPath: string,
         context: object,
+        options?: { forcedType?: 'keyboard' | 'inline' | 'url' },
     ): Promise<ReplyKeyboardMarkup | InlineKeyboardMarkup | undefined> {
+        if (options?.forcedType === 'keyboard') {
+            return this.buildKeyboardButtons(prefixPath, context);
+        } else if (options?.forcedType === 'inline') {
+            return this.buildInlineButtons(prefixPath, context);
+        } else if (options?.forcedType === 'url') {
+            return this.buildUrlButtons(prefixPath, context);
+        }
+
         let buttonType = 'none';
         try {
             await stat(`${prefixPath}-keyboard.njk`);

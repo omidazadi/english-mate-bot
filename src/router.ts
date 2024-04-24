@@ -15,6 +15,12 @@ export class Router {
             return 'word-reminder/jump';
         } else if (
             requestContext.telegramContext.text?.startsWith(
+                this.buttonTexts.command.start + ' 0001',
+            )
+        ) {
+            return 'review-word/navigate-in';
+        } else if (
+            requestContext.telegramContext.text?.startsWith(
                 this.buttonTexts.command.start + ' ',
             )
         ) {
@@ -51,6 +57,11 @@ export class Router {
                 this.buttonTexts.state.word_reminder.premium_decks
             ) {
                 return 'premium/navigate-in';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.word_reminder.settings
+            ) {
+                return 'settings/navigate-in';
             } else if (
                 requestContext.telegramContext.text ===
                 this.buttonTexts.state.word_reminder.talk_to_admin
@@ -186,6 +197,38 @@ export class Router {
                 return 'premium/navigate-out';
             } else {
                 return 'premium/details';
+            }
+        } else if (requestContext.learner.data.state === 'settings') {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.settings.back
+            ) {
+                return 'settings/navigate-out';
+            } else if (
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.settings.mute ||
+                requestContext.telegramContext.text ===
+                    this.buttonTexts.state.settings.unmute
+            ) {
+                return 'settings/set-muted-unmuted';
+            } else if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.settings.maximum_daily_reviews
+            ) {
+                return 'settings/navigate-to-set-maximum';
+            } else {
+                return 'common/unknown';
+            }
+        } else if (
+            requestContext.learner.data.state === 'modify-maximum-reviews'
+        ) {
+            if (
+                requestContext.telegramContext.text ===
+                this.buttonTexts.state.modify_maximum_reviews.back
+            ) {
+                return 'settings/navigate-to-settings';
+            } else {
+                return 'settings/set-maximum-reviews';
             }
         } else if (requestContext.learner.data.state === 'cli') {
             if (

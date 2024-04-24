@@ -12,7 +12,7 @@ export class ReviewWordNavigateInHandler extends Handler {
 
         if (
             requestContext.learner.dailyReviews >=
-                this.constant.card.dailyReviews ||
+                requestContext.learner.maximumDailyReviews ||
             dueCard === null
         ) {
             await this.frontend.sendActionMessage(

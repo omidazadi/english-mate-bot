@@ -11,6 +11,7 @@
             "manage": "Manage Your Words 💼",
             "statistics": "See Statistics 📊",
             "premium_decks": "Premium Decks 💎",
+            "settings": "Settings ⚙️",
             "talk_to_admin": "Talk to Admin 💻"
         },
         "add_word_front": {
@@ -50,6 +51,15 @@
             "back": "Back 🔙"
         },
         "premium_decks": {
+            "back": "Back 🔙"
+        },
+        "settings": {
+            "mute": "Mute 🔇",
+            "unmute": "Unmute 🔊",
+            "maximum_daily_reviews": "Maximum Daily Reviews 🔝",
+            "back": "Back 🔙"
+        },
+        "modify_maximum_reviews": {
             "back": "Back 🔙"
         },
         "cli": {

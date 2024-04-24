@@ -49,17 +49,27 @@ export class LearnerRepository {
         accessLevel: Learner.AccessLevel,
         dailyReviews: number,
         dailyAddedWords: number,
+        maximumDailyReviews: number,
+        isMuted: boolean,
         poolClient: PoolClient,
     ): Promise<Learner> {
         const result = await poolClient.query(
             `
             INSERT INTO
-            learner (tid, data, access_level, daily_reviews, daily_added_cards)
+            learner (tid, data, access_level, daily_reviews, daily_added_cards, maximum_daily_reviews, is_muted)
             VALUES
-                ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *
             `,
-            [tid, data, accessLevel, dailyReviews, dailyAddedWords],
+            [
+                tid,
+                data,
+                accessLevel,
+                dailyReviews,
+                dailyAddedWords,
+                maximumDailyReviews,
+                isMuted,
+            ],
         );
 
         return this.bake(result.rows[0]);
@@ -72,7 +82,7 @@ export class LearnerRepository {
         await poolClient.query(
             `
             UPDATE learner
-            SET data = $2, access_level = $3, daily_reviews = $4, daily_added_cards = $5
+            SET data = $2, access_level = $3, daily_reviews = $4, daily_added_cards = $5, maximum_daily_reviews = $6, is_muted = $7
             WHERE id = $1
             `,
             [
@@ -81,6 +91,8 @@ export class LearnerRepository {
                 learner.accessLevel,
                 learner.dailyReviews,
                 learner.dailyAddedCards,
+                learner.maximumDailyReviews,
+                learner.isMuted,
             ],
         );
     }
@@ -90,9 +102,10 @@ export class LearnerRepository {
     ): Promise<Array<[string, number]>> {
         const result = await poolClient.query(
             `
-            SELECT learner.tid as tid, COUNT(CASE WHEN card.is_due = TRUE THEN 1 END) as no_dues
+            SELECT learner.tid as tid, LEAST(COUNT(CASE WHEN card.is_due = TRUE THEN 1 END), learner.maximum_daily_reviews) as no_dues
             FROM learner LEFT JOIN card ON learner.id = card.owner
-            GROUP BY learner.tid
+            WHERE is_muted = FALSE
+            GROUP BY learner.tid, learner.maximum_daily_reviews
             `,
         );
 
@@ -100,6 +113,49 @@ export class LearnerRepository {
             row.tid as string,
             parseInt(row.no_dues),
         ]);
+    }
+
+    public async muteLearner(
+        tid: string,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            UPDATE learner
+            SET is_muted = TRUE
+            WHERE tid = $1
+            `,
+            [tid],
+        );
+    }
+
+    public async unmuteLearner(
+        tid: string,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            UPDATE learner
+            SET is_muted = FALSE
+            WHERE tid = $1
+            `,
+            [tid],
+        );
+    }
+
+    public async setMaximumDailyReviews(
+        id: number,
+        maximumDailyReviews: number,
+        poolClient: PoolClient,
+    ): Promise<void> {
+        await poolClient.query(
+            `
+            UPDATE learner
+            SET maximum_daily_reviews = $2
+            WHERE id = $1
+            `,
+            [id, maximumDailyReviews],
+        );
     }
 
     public async resetDailyStatistics(poolClient: PoolClient): Promise<void> {
@@ -119,6 +175,8 @@ export class LearnerRepository {
             row.access_level,
             row.daily_reviews,
             row.daily_added_cards,
+            row.maximum_daily_reviews,
+            row.is_muted,
         );
     }
 }

@@ -64,7 +64,7 @@ export class ReviewWordRateHandler extends Handler {
         const learner = instanceToInstance(requestContext.learner);
         learner.dailyReviews += 1;
         if (
-            learner.dailyReviews >= this.constant.card.dailyReviews ||
+            learner.dailyReviews >= learner.maximumDailyReviews ||
             dueCard === null
         ) {
             learner.data = {
