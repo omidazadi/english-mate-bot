@@ -7,7 +7,7 @@ export class DeckConstant {
     public constructor() {
         this.nameSize = 8;
         this.fullNameSize = 128;
-        this.descriptionSize = 1024;
+        this.descriptionSize = 3072;
         this.levelSize = 8;
     }
 }
